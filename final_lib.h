@@ -19,8 +19,6 @@ typedef double (*acc_t)(ps_t, ic_t, double);
 
 
 
-PUP§
-
 
 //--------------- FUNZIONI PER ACCELERAZIONE-----------------
 
