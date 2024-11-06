@@ -1,0 +1,128 @@
+
+FOTTUTA FUNZIONE DI MERDA
+
+
+void dEvsdt(struct phases *p, struct phases (*integration)(struct phases *s), FILE *a, FILE *b) {
+    double t = 0.0;
+    double E0 = 0.5 * p->m * p->v * p->v + 0.5 * p->k * p->x * p->x;
+    double dt_i=0.001;
+    int i=1000;
+    double deltaE;
+    
+    rewind(b);
+    reset(p, b);
+    integration(p); 
+    rewind(b);
+    reset(p, b); 
+
+   p->dt=dt_i;
+
+  if(p->value == 0){
+    while (p->dt <= 1. )
+     {
+        t = 0.;
+      
+        rewind(b);  
+        reset(p, b); 
+     
+        while (t < p->T) 
+        {
+            integration(p);
+            t += p->dt;
+        }
+       
+       deltaE = (p->E) - E0;
+        
+        
+        if (deltaE == INFINITY) break;
+        fprintf(a, "%lf\t%lf\n", deltaE, p->dt ); 
+        p->dt += 0.001;
+        
+      
+       
+    };
+  };
+ 
+  if(p->value == 1)
+  {
+   while (p->dt <= 1.0 )
+   {
+    t = 0.0;
+      
+        rewind(b);  
+        reset(p, b); 
+        
+        Cromer(p);  
+        t=t+(p->dt);
+        while (t < p->T) {
+            integration(p);
+            t += p->dt;
+        }
+
+       
+        double deltaE = (p->E) - E0;
+        
+        
+        if (deltaE == INFINITY) break;
+         fprintf(a, "%lf\t%lf\n", deltaE, p->dt  ) ;   
+        p->dt += 0.001;
+       
+      
+                                                                                                                     
+  };
+ };
+
+  
+ fclose(a);
+ fclose(b);
+};
+
+void dEvsdt1(struct phases *p, struct phases (*integration)(struct phases *s), FILE *a, FILE *b) {
+    double t = 0.0;
+    double E0 = 0.5 * p->m * p->v * p->v + 0.5 * p->k * p->x * p->x;
+    double E, deltaE;
+    double dt = 0.001;
+
+    // Esegui una chiamata iniziale a integration per impostare p->value
+    rewind(b);
+    reset(p,b);
+    integration(p);
+    rewind(b);
+    reset(p,b);
+
+    if (p->value == 0) {  
+        while (dt <= 1.0) {
+            t = 0.0;
+
+            rewind(b);
+            reset(p, b);
+
+        
+            while (t < p->T) {
+                p->a = (-p->k / p->m) * p->x;
+                p->x = p->x + p->v * dt;
+                p->v = p->v + p->a * dt;
+                t += dt;
+            }
+
+          
+            E = 0.5 * p->m * p->v * p->v + 0.5 * p->k * p->x * p->x;
+
+            
+            if (E == INFINITY) break;
+
+       
+            deltaE = E - E0;
+            
+            
+            fprintf(a, "%lf\t%lf\n", deltaE, dt);
+            
+            
+            dt += 0.001;
+        }
+    }
+
+    fclose(a);
+    fclose(b);
+};
+
